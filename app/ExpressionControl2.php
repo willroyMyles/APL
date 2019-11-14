@@ -50,9 +50,10 @@ class ExpressionControl{
 
     function removeNulls($array){
         $arr =[];
+        echo implode($array)." remove null<br>";
+
         for($i =0 ; $i < count($array); $i++){
             if($array[$i] == null) continue;
-            //$arr->push($array[$i]);
             array_push($arr, $array[$i]);
         }
         return $arr;
@@ -97,50 +98,49 @@ class ExpressionControl{
 
     }
 
-    function caluculateClosingArray($array, $offset){
-        echo implode($array)." ins in the closing array at start <br>";
+    // function caluculateClosingArray($array, $offset){
+    //     echo implode($array)." ins in the closing array at start <br>";
 
-        $currentArray =[];
-        //echo implode($currentArray)." ins in the current array at start <br>";
+    //     $currentArray =[];
+    //     //echo implode($currentArray)." ins in the current array at start <br>";
 
-        $bracketCount =0;
-        for($i = $offset; $i < count($array); $i++){
-            echo implode($array)." ins in the closing array at loop ".$i." <br>";
-           // echo implode($currentArray)." ins in the current array at loop ".$i." <br>";
+    //     $bracketCount =0;
+    //     for($i = $offset; $i < count($array); $i++){
+    //         echo implode($array)." ins in the closing array at loop ".$i." <br>";
+    //        // echo implode($currentArray)." ins in the current array at loop ".$i." <br>";
 
-            if($array[$i] == null) continue;
+    //         if($array[$i] == null) continue;
 
-            if($array[$i] == '('){
-                $bracketCount++;
-                $array[$i] = null;
-            }
+    //         if($array[$i] == '('){
+    //             $bracketCount++;
+    //             $array[$i] = null;
+    //         }
 
-            if($bracketCount > 1) {
-                $array[$i]= '(';
-                $currentArray[$i] = $this->caluculateClosingArray($array, $i);
-                echo implode($currentArray);
-                // $bracketCount--;
-            }
+    //         if($bracketCount > 1) {
+    //             $array[$i]= '(';
+    //             $array = $this->caluculateClosingArray($array, $i);
+    //             $bracketCount--;
+    //         }
 
-            if($bracketCount!=0 && $array[$i] != ')' && $array[$i] != null){
+    //         if($bracketCount!=0 && $array[$i] != ')' && $array[$i] != null){
                
-                array_push($currentArray, $array[$i]);
-                $array[$i] = null;
-            }
+    //             array_push($currentArray, $array[$i]);
+    //             $array[$i] = null;
+    //         }
 
-            if( $array[$i] == ')') {
-                $bracketCount--;
-                $currentArray = $this->removeNulls($currentArray);
-                $var = $this->evaluateSigns($currentArray);
-                $array[$i] = $this->evaluateSigns($currentArray);
-                return $array;
-                //evaluate inner bracket
-            }
-            if($bracketCount < 0) return "argument not in proper form";
-        }
-    }
+    //         if( $array[$i] == ')') {
+    //             $bracketCount--;
+    //             $currentArray = $this->removeNulls($currentArray);
+    //             $array[$i] = $this->evaluateSigns($currentArray);
+    //             $currentArray = [];
+    //             return $array;
+    //             //evaluate inner bracket
+    //         }
+    //         if($bracketCount < 0) return "argument not in proper form";
+    //     }
+    // }
 
-    function countBracketsToArray($array, $offset){
+    function countBracketsToArray($array, $offset, $return = false){
         $currentArray =[];
         $bracketCount =0;
         for($i = $offset; $i < count($array); $i++){
@@ -153,7 +153,7 @@ class ExpressionControl{
 
             if($bracketCount > 1) {
                 $array[$i]= '(';
-                $array= $this->caluculateClosingArray($array, $i);
+                $array= $this->countBracketsToArray($array, $i);
                 echo implode($array)."is returned from closing array ........ <br>";
                 //$bracketCount--;
                 echo implode($array). " array value <br>";
@@ -173,6 +173,8 @@ class ExpressionControl{
                 $array[$i] = $this->evaluateSigns($currentArray);
                 $currentArray = [];
                 //evaluate inner bracket
+
+                if($return) return $array;
             }
             if($bracketCount < 0) return "argument not in proper form";
         }
