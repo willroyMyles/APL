@@ -13,13 +13,14 @@ class PagesController extends Controller
     }
 
     public function operational(){
-        return view("operational");
+        return view("operational")->with(["expression" => " ", "answer" => false, "string" => false]);
+
     }
     public function denotational(){
-        return view("denotational");
+        return view("denotational")->with(["expression"=> " ", "answer" => false, "string" => false]);
     }
     public function axiomatic(){
-        return view("axiomatic");
+        return view("axiomatic")->with(["expression"=> "", "answer" => "", "string" => ""]);
     }
     public function about(){
         return view("about");

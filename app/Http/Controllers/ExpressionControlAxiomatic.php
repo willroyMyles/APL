@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\PagesController;
 
-class ExpressionControl{
+class ExpressionControlAximatic{
 
     private $stack;
     private $string = "";
-
+    private $addToLeftHandSideString = "";
     function __contructor(){}
 
     public function addToString($variable){
@@ -15,12 +15,25 @@ class ExpressionControl{
 
     function evaluateNumber($num1, $op, $num2){
         $val = 0;
+        if(preg_match('/[A-Za-z]/',$num1) ){
+            if($op == '+') $this->addToLeftHandSideString = $this->addToLeftHandSideString."-".strval($num2);
+            if($op == '-') $this->addToLeftHandSideString = $this->addToLeftHandSideString."+".strval($num2);
+            if($op == '/') $this->addToLeftHandSideString = $this->addToLeftHandSideString."*".strval($num2);
+            if($op == '*') $this->addToLeftHandSideString = $this->addToLeftHandSideString."/".strval($num2);
+            return $num1;
+        }
+        if(preg_match('/[A-Za-z]/',$num2) ){
+            if($op == '+') $this->addToLeftHandSideString = $this->addToLeftHandSideString."-".strval($num1);
+            if($op == '-') $this->addToLeftHandSideString = $this->addToLeftHandSideString."+".strval($num1);
+            if($op == '/') $this->addToLeftHandSideString = $this->addToLeftHandSideString."*".strval($num1);
+            if($op == '*') $this->addToLeftHandSideString = $this->addToLeftHandSideString."/".strval($num1);
+            return $num2;
+        }
+        
         if($op == '+') $val = $num1 + $num2;
         if($op == '-') $val = $num1 - $num2;
         if($op == '/') $val = $num1 / $num2;
         if($op == '*') $val = $num1 * $num2;
-
-        echo $val. "   value returned!!! <br>";
         return $val;
     }
 
@@ -62,11 +75,12 @@ class ExpressionControl{
 
         }
         if(count($array) > 1) $array = $this->evaluateSigns($array);
-        if((gettype($array) == "double")==1) return $array; 
         return $array[0];
     }
 
-   
+ 
+
+
     function countBracketsToArray($array, $offset, $return = false){
         $currentArray =[];
         $bracketCount =0;
@@ -104,32 +118,80 @@ class ExpressionControl{
         }
         if($bracketCount != 0) return "argument not in proper form";
 
-        
         $array = $this->removeNulls($array);
-        echo implode($array)."<br>";
-        $ans = $this->evaluateSigns($array);
 
-        echo $ans . "this may be the answer <br>";
+        $ans = $this->evaluateSigns($array);
 
         return $ans;
 
     }
     
  
-    function orderValues($expression, $justAnswer = false){
+    function orderValues($expression){
         //sort expression into parts by brackets
         $stringArray = str_split($expression, 1);
         $this->addToString($expression);
         $ans = $this->countBracketsToArray($stringArray, 0);
-        if($justAnswer) return $ans;
+
         return [$ans, $this->string];
+
+
     }
 
-    function start($expression){
+    function start1($expression){
         $ec = new ExpressionControl();
         $answer = $ec->orderValues($expression);
         return $answer;
     }
+
+function start($expression, $condition ){
+    $ec = new ExpressionControlAximatic();
+    return $ec->splitBySign($expression, $condition);
+}
+
+function splitBySign($expression, $condition){
+    //seperate equation by equal sign
+    $split = explode("=",$expression);
+
+    //turn into arrays
+    $lefthandSide = $split[0];
+    $righthandSide = str_split($split[1],1);
+
+   
+
+    //evaluate the right hand side
+    $rightHandAnswer = $this->countBracketsToArray($righthandSide, 0);
+
+    //replace the left hand side and hold the operator
+    $split = preg_split('/[><]/', $condition);
+    $leftCondition = $split[0];
+    $rightCondition = $split[1];
+    $operator = preg_match('/>/', $condition) ? ">" : "<";
+
+    //equate left hand side with condition
+    if($leftCondition===$lefthandSide) $lefthandSide = $rightCondition;
+    else $lefthandSide = $leftCondition;
+
+    echo $lefthandSide. " left hand side <br>";
+
+    //add equation to left side
+    $lefthandSide = $lefthandSide . $this->addToLeftHandSideString;
+   
+    echo $lefthandSide. " left hand side expression <br>";
+    //change it to array by operators
+    $lefthandSide = preg_split('/([+,\-,*,\/])/',$lefthandSide, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+    echo implode($lefthandSide). "After regex <br>";
+
+    //run it thru ExpressionControl2 to evaluate answer
+    $ec = new ExpressionControl();
+    $leftHandAnswer = $ec->countBracketsToArray($lefthandSide,0);
+
+    echo $leftHandAnswer." left hand answer <br>";
+    return "{$leftHandAnswer} {$operator} {$rightHandAnswer} ";
+
+}
+
+
 }
 
 

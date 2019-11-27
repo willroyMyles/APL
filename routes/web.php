@@ -11,9 +11,15 @@
 |
 */
 
+use App\Http\Controllers\operationalController;
+
 Route::get('/', "PagesController@home");
 Route::get('/home', "PagesController@home");
 Route::get('/operational', "PagesController@operational");
 Route::get('/denotational', "PagesController@denotational");
 Route::get('/axiomatic', "PagesController@axiomatic");
 Route::get('/about', "PagesController@about");
+
+Route::post("/operational", "operationalController@onFormOperational");
+Route::post("/denotational", "operationalController@onFormDenotational");
+Route::post("/axiomatic", "operationalController@onFormAxiomatic");
